@@ -1,20 +1,32 @@
+// file: CharGenius/client/src/pages/Dashboard.tsx
+
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
-import { Plus, MessageCircle } from "lucide-react";
+import { Plus, MessageCircle, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import CharacterCard from "@/components/CharacterCard";
 import { type Character } from "@shared/schema";
 import { useTheme } from "@/components/ThemeProvider";
-import { Moon, Sun } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient"; // ✅ import Supabase client
 
 const Dashboard = () => {
   const [, setLocation] = useLocation();
   const { theme, setTheme } = useTheme();
 
+  // ✅ Supabase data fetch
   const { data: characters = [], isLoading } = useQuery<Character[]>({
-    queryKey: ["/api/characters"],
+    queryKey: ["characters"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("characters")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw new Error(error.message);
+      return data as Character[];
+    },
   });
 
   const stats = [
@@ -36,7 +48,7 @@ const Dashboard = () => {
             <MessageCircle className="text-2xl text-purple-500" />
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">CharacterChat</h1>
           </motion.div>
-          
+
           <div className="flex items-center space-x-4">
             <Button
               variant="ghost"
@@ -46,7 +58,6 @@ const Dashboard = () => {
             >
               {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </Button>
-            
             <Button
               variant="ghost"
               onClick={() => setLocation("/")}
@@ -60,7 +71,7 @@ const Dashboard = () => {
 
       <div className="container mx-auto px-6 py-20 max-w-6xl">
         {/* Dashboard Header */}
-        <motion.div 
+        <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -71,11 +82,8 @@ const Dashboard = () => {
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
             Click on any character to start a conversation
           </p>
-          
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               onClick={() => setLocation("/create")}
               className="inline-flex items-center space-x-3 px-8 py-4 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-semibold text-lg"
@@ -109,7 +117,7 @@ const Dashboard = () => {
             ))}
           </div>
         ) : characters.length === 0 ? (
-          <motion.div 
+          <motion.div
             className="text-center py-20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -135,7 +143,7 @@ const Dashboard = () => {
             </Card>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -151,7 +159,7 @@ const Dashboard = () => {
                 <CharacterCard character={character} />
               </motion.div>
             ))}
-            
+
             {/* Add New Character Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -163,7 +171,7 @@ const Dashboard = () => {
             >
               <Card className="glass-effect border-2 border-dashed border-purple-400/40 hover:border-purple-400 transition-all duration-300 min-h-[300px] flex items-center justify-center">
                 <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 mx-auto group-hover:bg-purple-500/30 transition-colors duration-300">
+                  <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
                     <Plus className="text-2xl text-purple-500" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
@@ -180,17 +188,14 @@ const Dashboard = () => {
 
         {/* Dashboard Statistics */}
         {characters.length > 0 && (
-          <motion.div 
+          <motion.div
             className="mt-16 grid md:grid-cols-3 gap-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
             {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ scale: 1.05 }}
-              >
+              <motion.div key={index} whileHover={{ scale: 1.05 }}>
                 <Card className="glass-effect border-white/20 text-center">
                   <CardContent className="p-6">
                     <div className={`text-3xl font-bold ${stat.color} mb-2`}>
