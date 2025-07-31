@@ -8,7 +8,7 @@ interface TypewriterTextProps {
   className?: string;
 }
 
-const TypewriterText = ({ text, speed = 50, onComplete, className = "" }: TypewriterTextProps) => {
+const TypewriterText = ({ text, speed = 10, onComplete, className = "" }: TypewriterTextProps) => {
   const [displayText, setDisplayText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
