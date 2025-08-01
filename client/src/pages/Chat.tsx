@@ -118,7 +118,7 @@ const Chat = () => {
               <div className="flex items-center justify-between p-6">
                 <div className="flex items-center space-x-3">
                   <img
-                    src={character.avatar ?? ""}
+                    src={character.avatar || "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40&q=80"} 
                     alt={character.name ?? ""}
                     className="w-12 h-12 rounded-full ..."
                     onError={({ currentTarget }) => currentTarget.src = ""}
@@ -142,7 +142,7 @@ const Chat = () => {
                   <motion.div key={msg.id} initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay: idx*0.1 }} className={`flex ... ${msg.sender==="user"?"justify-end":""}`}>
                     {msg.sender === "character" && (
                       <img
-                        src={character?.avatar ?? ""}
+                        src={character.avatar || "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40&q=80"} 
                         alt={character?.name ?? "Character Avatar"}
                         className="w-8 h-8 rounded-full mr-2"
                       />
