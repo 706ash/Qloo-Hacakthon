@@ -193,6 +193,43 @@ This section should list any major frameworks/libraries used to bootstrap your p
 - **External API Integration**: Multiple HTTP requests for enhanced character development
 - **Advanced Orchestration**: Complex multi-tool workflow with coordinated processing
 
+### 📁 n8n Workflow Files
+
+The backend automation workflows are available as JSON files for local deployment:
+
+- **`n8n workflows/Character chat agent workflow.json`** - Main character interaction workflow
+- **`n8n workflows/Character creation agent workflow.json`** - Character generation workflow
+
+#### Local n8n Setup Instructions
+
+To run these workflows locally:
+
+1. **Install n8n**
+   ```bash
+   npm install n8n -g
+   ```
+
+2. **Start n8n**
+   ```bash
+   n8n start
+   ```
+
+3. **Import Workflows**
+   - Open n8n in your browser (usually `http://localhost:5678`)
+   - Go to "Workflows" → "Import from file"
+   - Select the workflow JSON files from the `n8n workflows/` directory
+
+4. **Configure Environment Variables**
+   - Set up your Supabase connection string
+   - Add your Google Gemini API key
+   - Configure any other required API keys
+
+5. **Activate Workflows**
+   - Toggle the "Active" switch on each workflow
+   - Test the webhook endpoints
+
+**Note**: Make sure to update the webhook URLs and API credentials in the imported workflows to match your local setup.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
