@@ -1,0 +1,392 @@
+{
+  "name": "Character creation agent workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "You are a multi‐tool AI assistant with two sequential responsibilities. Maintain a calm, empathetic tone. Never force the user to fill any field or repeat a question they’ve already answered.\n\n────────────────────────────────────────────────────────\nPHASE 1: Qloo® Taste API ORCHESTRATION\n────────────────────────────────────────────────────────\n\nAsk the user for their taste-profile (e.g. “I love dark chocolate and jazz”).\n\nIf the user is unsure or asks to brainstorm, offer a few example taste-profiles (e.g. “Do you prefer spicy foods, mellow drinks, retro music?”) and let them pick or refine one.\n\nCall the HTTP Request1 node (Qloo® Search API) with that input.\n\nParse its JSON response and extract the top result’s id.\n\nCall the HTTP Request3 node (Qloo® Insights API), passing that id.\n\nIf either call fails, report the error and stop. Otherwise retain the Insights output for Phase 2.\n\n────────────────────────────────────────────────────────\nPHASE 2: SUPABASE‐AWARE CHARACTER CREATION\n────────────────────────────────────────────────────────\nYou now collect user input to build one row in Supabase’s characters table. The table schema is:\n\nid UUID PK, default gen_random_uuid()\nuser_id UUID FK, optional\nname TEXT nullable\narchetype TEXT nullable\nbackstory TEXT nullable\npersonality TEXT nullable\norigin TEXT nullable\ngoals TEXT nullable\nfears TEXT nullable\npersonality_traits JSONB default {}\ntaste_profile JSONB default {}\ncustom_fields JSONB default {}\ncustom_fields_summary TEXT nullable\ncreated_at TIMESTAMP auto\nupdated_at TIMESTAMPTZ auto\n\nGuidelines:\n• Auto-populate taste_profile from the Insights API.\n• For each other column, prompt once, mapping the reply into its field; if the user opts to skip, respect that and never re-ask.\n• Collect any user-defined custom traits into custom_fields (JSONB) and summarize them in custom_fields_summary.\n• Retain all details accurately; do not jumble or overwrite earlier inputs.\n• Only when the user explicitly types “done” or “save,” invoke the Create a row in Supabase tool with exactly the collected field values.\n\nAfter saving, confirm “Character saved.” and await further instructions."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -288,
+        -176
+      ],
+      "id": "6c0a4119-a15e-43b9-ac52-f1dcdb15fe45",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        112
+      ],
+      "id": "e806ddb8-15bb-41ec-aef7-10bdcb437d2c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "QXcA37wGRo8oDYiJ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -208,
+        128
+      ],
+      "id": "d00f0a04-96be-4ab1-a3b1-43e67c42de63",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "POST"
+        ],
+        "path": "e3f8a0be-d60c-4814-8b59-7395ed4e66ca",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -512,
+        -176
+      ],
+      "id": "a88ab06f-5f9c-47ba-a7f4-f5b0b997d9e6",
+      "name": "Webhook",
+      "webhookId": "e3f8a0be-d60c-4814-8b59-7395ed4e66ca"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        320,
+        -176
+      ],
+      "id": "b1f33c57-024b-4925-ae18-f0b7a580f35c",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "881be2fe-c896-4338-a6c5-0a8bb5a11918",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        96,
+        -176
+      ],
+      "id": "ca50a65a-6650-4d9a-948e-e99264593cae",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create a row in Supabase",
+        "tableId": "characters",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues0_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "archetype",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues1_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "backstory",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "personality_traits",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "taste_profile",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues4_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "goals",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues5_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "fears",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues6_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "custom_fields_summary",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues7_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "custom_fields",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues8_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "personality",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues9_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "origin",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues10_Field_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        112
+      ],
+      "id": "ae1d3fec-a493-462b-94d9-30553a5855ec",
+      "name": "Create a row in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XT3zZjffXcrLAwdm",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://hackathon.api.qloo.com/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `this attribute had example beyonce.can you do this for similar artists based on user imput.`, 'string') }}"
+            },
+            {
+              "name": "types",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', `the following entity types are possible:\nurn:entity:actor  \nurn:entity:album  \nurn:entity:artist  \nurn:entity:author  \nurn:entity:book  \nurn:entity:brand  \nurn:entity:destination  \nurn:entity:director  \nurn:entity:locality  \nurn:entity:movie  \nurn:entity:person  \nurn:entity:place  \nurn:entity:podcast  \nurn:entity:tv_show  \nurn:entity:videogame\n`, 'string') }}"
+            },
+            {
+              "name": "filter.radius",
+              "value": "10"
+            },
+            {
+              "name": "filter.tags"
+            },
+            {
+              "name": "operator.filter.tags",
+              "value": "union"
+            },
+            {
+              "name": "operator.filter.exclude.tags",
+              "value": "union"
+            },
+            {
+              "name": "page",
+              "value": "1"
+            },
+            {
+              "name": "take",
+              "value": "20"
+            },
+            {
+              "name": "sort_by",
+              "value": "match"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Api-Key",
+              "value": "SQeyrkZJvy8OUeF95EMKZolCz0qXrp3C5i9GlnyQ6iU"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        96,
+        112
+      ],
+      "id": "d2c3d7d1-37ff-48b5-9f26-6af5a0c5b6c0",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "https://hackathon.api.qloo.com/v2/insights",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter.type",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `the following entity types are possible:\nurn:entity:artist  \nurn:entity:book  \nurn:entity:brand  \nurn:entity:destination  \nurn:entity:movie  \nurn:entity:person  \nurn:entity:place  \nurn:entity:podcast  \nurn:entity:tv_show  \nurn:entity:videogame  \nurn:heatmap\n`, 'string') }}"
+            },
+            {
+              "name": "signal.interests.entities",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', `put the entity id from HTTP Request1 here so that we can gain insight`, 'string') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Api-Key",
+              "value": "SQeyrkZJvy8OUeF95EMKZolCz0qXrp3C5i9GlnyQ6iU"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        112
+      ],
+      "id": "84adb03c-b67d-4674-a40d-304d504e5f32",
+      "name": "HTTP Request3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row in Supabase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "60548eb2-79ee-4be0-8b11-7251c6217077",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9510ffc9ed01b08a676c184835c5b9d431b6d0f1e185bf700589f64ef9f5550d"
+  },
+  "id": "l83FXnw9WQ8VreCz",
+  "tags": []
+}

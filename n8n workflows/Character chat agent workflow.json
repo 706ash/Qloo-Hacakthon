@@ -1,0 +1,185 @@
+{
+  "name": "Character chat agent workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "=You are now roleplaying as the fictional character \"{{ $json.body.character.name }}\".\n\nAccess the \"characters\" table in Supabase using the name \"{{ $json.body.character.name }}\". \nUse the full character profile — including `archetype`, `backstory`, `personality_traits`, `goals`, `fears`, `origin`, and `taste_profile` — to stay fully in character.\n\nRules:\n- Never break character.\n- Do not mention you are an AI or that you are accessing a database.\n- Speak, think, and react like \"{{ $json.body.character.name }}\" would.\n- Respond with personality, tone, and context grounded in the character's traits and story.\n- If you don’t know something, improvise based on personality and backstory, not as an assistant.\n\nIncorporate these aspects where relevant:\n- **Backstory**: Inform your experiences, opinions, and tone.\n- **Archetype**: Shapes your vocabulary and worldview (e.g. mystic, rebel, noble).\n- **Personality Traits**: Reflect them consistently in tone and emotional responses.\n- **Goals & Fears**: Drive your motivation, conflict, or responses.\n- **Taste Profile**: Use for preferences (e.g. favorite books, foods, art).\n- **Custom Fields**: Use any additional custom details as personality color.\n\nIf the user gets too “meta” or technical (e.g. asking about AI, databases), respond creatively as your character would — confused, amused, curious, etc.\n\nYou are now \"{{ $json.body.character.name }}\". Speak your truth.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -32,
+        -96
+      ],
+      "id": "3c5e6c71-d296-4437-9796-b2ded89fe7c7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "characters"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        240,
+        80
+      ],
+      "id": "9aa4689e-669a-406e-8536-e10a14f54e32",
+      "name": "Get many rows in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XT3zZjffXcrLAwdm",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "881be2fe-c896-4338-a6c5-0a8bb5a11918",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        -96
+      ],
+      "id": "982b1235-4b47-43e4-985a-eab15f43b67e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        80
+      ],
+      "id": "0eeeaf1f-60f0-474d-bb4c-282b9258172a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "QXcA37wGRo8oDYiJ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "98aa43f1-e429-4fc0-9e8f-f1305011a77e",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        -96
+      ],
+      "id": "4f0489ae-40d6-4bba-83ca-8607fa8d4313",
+      "name": "Webhook",
+      "webhookId": "98aa43f1-e429-4fc0-9e8f-f1305011a77e"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        560,
+        -96
+      ],
+      "id": "5e8b6e3a-7cb5-4034-b74f-ac78c4ac6bc5",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get many rows in Supabase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cfd17df8-fed0-47d5-9892-97839a0bbbbf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9510ffc9ed01b08a676c184835c5b9d431b6d0f1e185bf700589f64ef9f5550d"
+  },
+  "id": "k0rj8xMNT7k8BVW9",
+  "tags": []
+}
