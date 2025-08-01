@@ -1,8 +1,54 @@
 # CharacterChat Application
 
+> **Bring Your Characters to Life Through AI Conversations**
+
 ## Overview
 
 CharacterChat is a full-stack web application that allows users to create and interact with custom AI characters through chat conversations. The application features a React frontend with a Node.js/Express backend, utilizing PostgreSQL for data persistence through Drizzle ORM.
+
+### Features
+
+### 🏠 Landing Page - Creative Inspiration Hub
+![Landing Page](screenshots/landing-page.png)
+
+**Features showcased:**
+- **Modern Gradient Design**: Beautiful blue-to-pink gradient background with subtle icon overlays
+- **Clear Value Proposition**: "Stuck? Chat with Your Character for Inspiration"
+- **Target Audience Focus**: Perfect for authors, artists, and game designers
+- **Quick Action**: Prominent "+ Create a Character" button for immediate engagement
+- **Feature Highlights**: Three key benefit cards explaining Interactive Chats, Character Builder, and Creative Inspiration
+
+### 📱 Character Dashboard - Character Management
+![Character Dashboard](screenshots/character-dashboard.png)
+
+**Features showcased:**
+- **Character Grid Layout**: Clean, organized display of all created characters
+- **Character Profiles**: Each character shows name, role, and conversation status
+- **Online Status Indicators**: Green dots showing character availability
+- **Easy Navigation**: Dark mode toggle and home navigation
+- **Character Diversity**: Various character types (Hero, Trickster, Prophet, etc.)
+- **Quick Access**: "Create New Character" button prominently displayed
+
+### 🤖 Character Creator - AI-Powered Creation
+![Character Creator](screenshots/character-creator.png)
+
+**Features showcased:**
+- **Conversational UI**: Natural chat-based character creation process
+- **AI Guidance**: Intelligent prompts to help users define character traits
+- **Taste Profile Integration**: Detailed character preferences (food, music, etc.)
+- **User-Friendly Interface**: Clean chat interface with clear input areas
+- **Step-by-Step Process**: Guided character development through conversation
+
+### 💬 Interactive Chat - Character Conversations
+![Interactive Chat](screenshots/interactive-chat.png)
+
+**Features showcased:**
+- **Real-time Messaging**: Natural conversation flow with character responses
+- **Character Personality**: Each character has unique voice and responses
+- **Quick Prompts**: Suggested conversation starters for easy interaction
+- **Status Indicators**: Online status and character role display
+- **Responsive Design**: Clean, modern chat interface with intuitive controls
+- **Creative Inspiration**: Characters designed to help with creative projects
 
 ## User Preferences
 
