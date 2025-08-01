@@ -1,5 +1,3 @@
-// src/pages/Chat.tsx
-
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useParams } from "wouter";
@@ -11,7 +9,6 @@ import { supabase } from "@/lib/supabaseClient";
 import { type Character } from "@shared/schema";
 import TypewriterText from "@/components/TypewriterText";
 import CharacterSettings from "@/components/CharacterSettings";
-import { generateCharacterResponse } from "@/lib/characterResponses";
 
 interface Message {
   id: string;
@@ -72,8 +69,21 @@ const Chat = () => {
     return greetings[c.archetype ?? ""] || greetings.default;
   };
 
+  const sendToAgent = async (input: string) => {
+    const res = await fetch("http://localhost:5678/webhook/98aa43f1-e429-4fc0-9e8f-f1305011a77e", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: input })
+    });
+
+    const data = await res.json();
+    console.log("🧪 n8n response:", data);
+    return data.output;
+  };
+
   const handleSendMessage = async () => {
     if (!input.trim() || !character) return;
+
     const userMsg: Message = {
       id: Date.now().toString(),
       sender: "user",
@@ -84,17 +94,15 @@ const Chat = () => {
     setInput("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      const response = generateCharacterResponse(character, userMsg.content, messages);
-      const charMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: "character",
-        content: response,
-        timestamp: new Date().toISOString(),
-      };
-      setMessages(prev => [...prev, charMsg]);
-      setIsTyping(false);
-    }, 1000 + Math.random() * 2000);
+    const response = await sendToAgent(userMsg.content);
+    const charMsg: Message = {
+      id: (Date.now() + 1).toString(),
+      sender: "character",
+      content: response || "Sorry, I didn’t understand that.",
+      timestamp: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, charMsg]);
+    setIsTyping(false);
   };
 
   const quickMessages = [
@@ -110,10 +118,8 @@ const Chat = () => {
   return (
     <>
       <div className="fixed inset-0 ...">
-        {/* Chat Container */}
         <div className="container mx-auto h-full flex">
           <div className="flex-1 flex flex-col">
-            {/* Header */}
             <motion.div className="glass-effect border-b ..." initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
               <div className="flex items-center justify-between p-6">
                 <div className="flex items-center space-x-3">
@@ -135,7 +141,6 @@ const Chat = () => {
               </div>
             </motion.div>
 
-            {/* Message List */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               <AnimatePresence>
                 {messages.map((msg, idx) => (
@@ -164,7 +169,11 @@ const Chat = () => {
                   <img src={character.avatar ?? ""} alt="" className="w-8 h-8 rounded-full ..." />
                   <Card className="glass-effect border-white/20">
                     <CardContent className="p-4">
-                      <div className="flex space-x-1"><div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"></div><div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay:"0.1s"}}></div><div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay:"0.2s"}}></div></div>
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay:"0.1s"}}></div>
+                        <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay:"0.2s"}}></div>
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -172,7 +181,6 @@ const Chat = () => {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
             <motion.div className="p-6 glass-effect border-t ..." initial={{opacity:0,y:20}} animate={{opacity:1,y:0}}>
               <div className="flex space-x-3 mb-3">
                 <Input value={input} onChange={e=>setInput(e.target.value)} onKeyPress={e=> e.key==="Enter" && handleSendMessage()} placeholder="Ask me anything..." className="flex-1 glass-effect border-white/30 bg-white/50 dark:bg-black/20" disabled={isTyping} />
