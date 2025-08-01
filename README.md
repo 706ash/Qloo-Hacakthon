@@ -103,7 +103,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 
 ### Frontend Features
 
-#### 🏠 Landing Page - Creative Inspiration Hub
+#### Landing Page - Creative Inspiration Hub
 ![Landing Page](screenshots/landing-page.png)
 
 **Features showcased:**
@@ -113,7 +113,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 - **Quick Action**: Prominent "+ Create a Character" button for immediate engagement
 - **Feature Highlights**: Three key benefit cards explaining Interactive Chats, Character Builder, and Creative Inspiration
 
-#### 📱 Character Dashboard - Character Management
+#### Character Dashboard - Character Management
 ![Character Dashboard](screenshots/character-dashboard.png)
 
 **Features showcased:**
@@ -124,7 +124,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 - **Character Diversity**: Various character types (Hero, Trickster, Prophet, etc.)
 - **Quick Access**: "Create New Character" button prominently displayed
 
-#### 🤖 Character Creator - AI-Powered Creation
+#### Character Creator - AI-Powered Creation
 ![Character Creator](screenshots/character-creator.png)
 
 **Features showcased:**
@@ -134,7 +134,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 - **User-Friendly Interface**: Clean chat interface with clear input areas
 - **Step-by-Step Process**: Guided character development through conversation
 
-#### 💬 Interactive Chat - Character Conversations
+#### Interactive Chat - Character Conversations
 ![Interactive Chat](screenshots/interactive-chat.png)
 
 **Features showcased:**
@@ -149,7 +149,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 
 #### 🔧 n8n Workflows
 
-##### 🤖 AI Agent Workflow - Character Chat Processing
+##### AI Agent Workflow - Character Chat Processing
 ![AI Agent Workflow](screenshots/n8n-ai-agent-workflow.png)
 
 **Backend Features showcased:**
@@ -160,7 +160,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 - **HTTP Request Tools**: External API integrations for enhanced functionality
 - **Response Processing**: Automated field editing and webhook responses
 
-##### 🎭 Character Creation Workflow - AI-Powered Generation
+##### Character Creation Workflow - AI-Powered Generation
 ![Character Creation Workflow](screenshots/n8n-character-creation-workflow.png)
 
 **Backend Features showcased:**
@@ -171,7 +171,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 - **Workflow Orchestration**: Complex multi-step character generation process
 - **Real-time Processing**: Fast response times (6-53 seconds execution)
 
-##### 📊 Character Chat Agent - Successful Execution
+##### Character Chat Agent - Successful Execution
 ![Character Chat Agent Execution](screenshots/n8n-workflow-execution.png)
 
 **Backend Features showcased:**
@@ -182,7 +182,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 - **Error-Free Operation**: All workflow steps completed with green checkmarks
 - **Scalable Architecture**: Handles concurrent character chat requests efficiently
 
-##### 🔄 Character Creation Agent - Successful Execution
+##### Character Creation Agent - Successful Execution
 ![Character Creation Agent Execution](screenshots/n8n-advanced-workflow.png)
 
 **Backend Features showcased:**
